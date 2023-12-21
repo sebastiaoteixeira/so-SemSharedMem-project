@@ -56,16 +56,16 @@ typedef struct
 /** \brief number of semaphores in the set */
 #define SEM_NU               ( 7 + sh->fSt.nGroups + 3*NUMTABLES )
 
-#define MUTEX                  1
-#define RECEPTIONISTREQ        2
-#define RECEPTIONISTREQUESTPOSSIBLE  3
-#define WAITERREQUEST          4
-#define WAITERREQUESTPOSSIBLE  5
-#define WAITORDER              6
-#define ORDERRECEIVED          7
-#define WAITFORTABLE           8
-#define FOODARRIVED            (WAITFORTABLE+sh->fSt.nGroups)
-#define REQUESTRECEIVED        (FOODARRIVED+NUMTABLES)
-#define TABLEDONE              (REQUESTRECEIVED+NUMTABLES)
+#define MUTEX                  1	// Shared Memory Manipulation
+#define RECEPTIONISTREQ        2 	// Receptionist waits for a request from a group
+#define RECEPTIONISTREQUESTPOSSIBLE  3 // Wait until receptionist is ready
+#define WAITERREQUEST          4 	// Waiter waits for a request from a group or from a the chef
+#define WAITERREQUESTPOSSIBLE  5	// Wait until waiter is ready
+#define WAITORDER              6	// Chef waits for waiter order
+#define ORDERRECEIVED          7	// Waiter waits for chef's order received confirmation'
+#define WAITFORTABLE           8    // Group waits for the instruction for wait for a table from waiter
+#define FOODARRIVED            (WAITFORTABLE+sh->fSt.nGroups) // Group wait for food arrive from waiter
+#define REQUESTRECEIVED        (FOODARRIVED+NUMTABLES) // Group wait for indication from waiter that the request was informed to 
+#define TABLEDONE              (REQUESTRECEIVED+NUMTABLES) // Receptionist wait for some table done from the group in that table
 
 #endif /* SHAREDDATASYNC_H_ */
