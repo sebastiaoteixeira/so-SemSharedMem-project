@@ -178,12 +178,23 @@ static request waitForClientOrChef()
 	// Read request
 	req = sh->fSt.waiterRequest;
 
+	// Get table
+	int isFromGroup = req.reqType == FOODREQ;
+	int table = sh->fSt.assignedTable[req.reqGroup];
+
     if (semUp (semgid, sh->mutex) == -1) {                                                  /* exit critical region */
         perror ("error on the down operation for semaphore access (WT)");
         exit (EXIT_FAILURE);
     }
 
     // TODO insert your code here
+	// If request is from group,
+	// up for group in table that request was received
+	if (isFromGroup && semUp (semgid, sh->requestReceived[table]) == -1)  {                                                  /* enter critical region */
+		perror ("error on the up operation for semaphore access (WT)");
+		exit (EXIT_FAILURE);
+	}
+	
 
     return req;
 
@@ -212,8 +223,7 @@ static void informChef (int n)
 	sh->fSt.foodGroup = n;
 
 	// Save state
-	saveState(nFic, &sh->fSt);	
-
+	saveState(nFic, &sh->fSt);
 
     if (semUp (semgid, sh->mutex) == -1)                                                   /* exit critical region */
     { perror ("error on the down operation for semaphore access (WT)");
