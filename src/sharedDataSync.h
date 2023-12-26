@@ -62,8 +62,8 @@ typedef struct
 #define WAITERREQUEST          4 	// Waiter waits for a request from a group or from a the chef
 #define WAITERREQUESTPOSSIBLE  5	// Wait until waiter is ready
 #define WAITORDER              6	// Chef waits for waiter order
-#define ORDERRECEIVED          7	// Waiter waits for chef's order received confirmation'
-#define WAITFORTABLE           8    // Group waits for the instruction for wait for a table from waiter
+#define ORDERRECEIVED          7	// Waiter waits for chef's order received confirmation
+#define WAITFORTABLE           8    // Group waits the instruction to wait for a table from waiter
 #define FOODARRIVED            (WAITFORTABLE+sh->fSt.nGroups) // Group wait for food arrive from waiter
 #define REQUESTRECEIVED        (FOODARRIVED+NUMTABLES) // Group wait for indication from waiter that the request was informed to 
 #define TABLEDONE              (REQUESTRECEIVED+NUMTABLES) // Receptionist wait for some table done from the group in that table
