@@ -226,16 +226,14 @@ static request waitForGroup()
     }
 
     // TODO insert your code here
-    if (semUp (semgid, sh->receptionistRequestPossible) == -1)  {                                                  /* exit critical region */
-     perror ("error on the down operation for semaphore access (WT)");
-        exit (EXIT_FAILURE);
-    }
+	printf("Receptionist is ready\n");
 
 	// Announce that new requests are possible
 	if (semDown (semgid, sh->receptionistReq) == -1)  {                                                  /* exit critical region */
 		perror ("error on the down operation for semaphore access (WT)");
 		exit (EXIT_FAILURE);
 	}
+	printf("Receptionist received a request\n");
 
 
     if (semDown (semgid, sh->mutex) == -1)  {                                                  /* enter critical region */
@@ -254,6 +252,10 @@ static request waitForGroup()
     }
 
     // TODO insert your code here
+    if (semUp (semgid, sh->receptionistRequestPossible) == -1)  {                                                  /* exit critical region */
+     perror ("error on the down operation for semaphore access (WT)");
+        exit (EXIT_FAILURE);
+    }
 
     return ret;
 
@@ -271,7 +273,6 @@ static request waitForGroup()
 static void provideTableOrWaitingRoom (int n)
 {
 
-	printf("Wait for a request\n");
     if (semDown (semgid, sh->mutex) == -1)  {                                                  /* enter critical region */
         perror ("error on the up operation for semaphore access (WT)");
         exit (EXIT_FAILURE);
