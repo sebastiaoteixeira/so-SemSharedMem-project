@@ -152,7 +152,6 @@ static int decideTableOrWait(int n)
     //TODO insert your code here
 
 	if (sh->fSt.st.groupStat[n] !=   ATRECEPTION || sh->fSt.assignedTable[n] != -1) {
-		printf("decideTableOrWait: group %d is not at reception or already has a table (%d)\n", n, sh->fSt.assignedTable[n]);
 		return -1;
 	}
 
@@ -165,7 +164,6 @@ static int decideTableOrWait(int n)
 	}
 
 	for (int i = 0; i < NUMTABLES; i++) {
-		printf("tablesRecord[%d]: %d\n", i, tablesRecord[i]);
 		if (!tablesRecord[i]) {
 			free(tablesRecord);
 			return i;
@@ -226,15 +224,11 @@ static request waitForGroup()
     }
 
     // TODO insert your code here
-	printf("Receptionist is ready\n");
-
 	// Announce that new requests are possible
 	if (semDown (semgid, sh->receptionistReq) == -1)  {                                                  /* exit critical region */
 		perror ("error on the down operation for semaphore access (WT)");
 		exit (EXIT_FAILURE);
 	}
-	printf("Receptionist received a request\n");
-
 
     if (semDown (semgid, sh->mutex) == -1)  {                                                  /* enter critical region */
         perror ("error on the up operation for semaphore access (WT)");
@@ -287,7 +281,6 @@ static void provideTableOrWaitingRoom (int n)
 	// Save state
 	saveState(nFic, &sh->fSt);
 
-	printf("Receptionist found a free table %d\n", table);
 	if (table == -1) {
 		groupRecord[n] = WAIT;
 		sh->fSt.groupsWaiting++;
@@ -295,7 +288,6 @@ static void provideTableOrWaitingRoom (int n)
 		groupRecord[n] = ATTABLE;
         sh->fSt.assignedTable[n] = table;
 		// Announce group that it can proceed
-		printf("Receptionist provides table to %d\n", n);
 		if (semUp (semgid, sh->waitForTable[n]) == -1)  {                                                  /* exit critical region */
 			perror ("error on the down operation for semaphore access (WT)");
 			exit (EXIT_FAILURE);
@@ -341,19 +333,13 @@ static void receivePayment (int n)
     sh->fSt.assignedTable[n] = -1;
 
     // Check if there are waiting groups
-	printf("Check if there are waiting groups\n");
     if (sh->fSt.groupsWaiting > 0){
 
         next_group = decideNextGroup();
-		printf("next_group: %d\n", next_group);
 
         if (next_group != -1) {
 			sh->fSt.assignedTable[next_group] = table_id;
-			printf("assignedTable[%d]: %d\n", next_group, table_id);
 
-			printf("Up for waitForTable: %d\n", next_group);
-
-			printf("groupsWaiting: %d\n", sh->fSt.groupsWaiting);
     	    sh->fSt.groupsWaiting--;
 			saveState(nFic, &sh->fSt);
 
@@ -366,7 +352,6 @@ static void receivePayment (int n)
         exit (EXIT_FAILURE);
     }
 
-	printf("Up for tableDone: %d\n", table_id);
     // TODO insert your code here
     if (semUp(semgid, sh->tableDone[table_id]) == -1){
         perror ("error on the down operation for semaphore access (WT)");
@@ -375,14 +360,10 @@ static void receivePayment (int n)
 
 	// Up for next_group
 	if (next_group != -1) {
-		printf("Up for waitForTable: %d\n", next_group);
 		if (semUp (semgid, sh->waitForTable[next_group]) == -1)  {                                                  /* exit critical region */
 			perror ("error on the down operation for semaphore access (WT)");
 			exit (EXIT_FAILURE);
 		}
 	}
-
-	printf("Payment received\n");
-
 }
 
