@@ -223,10 +223,13 @@ static void checkInAtReception(int id)
     }
 
     // TODO insert your code here
+	printf("I (%d) am waiting for a table\n", id);
     if(semDown(semgid, sh->waitForTable[id]) == -1){
         perror ("error on the down operation for semaphore access (CT)");
         exit (EXIT_FAILURE);
     }
+
+	printf("I (%d) receive instruction to proceed\n", id);
 
 }
 
@@ -245,6 +248,7 @@ static void orderFood (int id)
 
     int table_id;
     // TODO insert your code here
+	printf("Waiting by waiter request possible: %d\n", id);
     if (semDown (semgid, sh->waiterRequestPossible) == -1) {                                                  
         perror ("error on the down operation for semaphore access (CT)");
         exit (EXIT_FAILURE);
