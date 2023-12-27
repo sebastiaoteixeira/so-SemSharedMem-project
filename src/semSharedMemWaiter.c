@@ -149,17 +149,11 @@ static request waitForClientOrChef()
 	// Save state
 	saveState(nFic, &sh->fSt);
 
-
-	// Announce that new requests are possible
-	if (semUp (semgid, sh->waiterRequestPossible) == -1)  {                                                  /* exit critical region */
-		perror ("error on the down operation for semaphore access (WT)");
-		exit (EXIT_FAILURE);
-	}
-    
     if (semUp (semgid, sh->mutex) == -1)      {                                             /* exit critical region */
         perror ("error on the down operation for semaphore access (WT)");
         exit (EXIT_FAILURE);
     }
+    
 
     // TODO insert your code here
 	// Down for a request
@@ -178,10 +172,6 @@ static request waitForClientOrChef()
 	// Read request
 	req = sh->fSt.waiterRequest;
 
-	// Get table
-	int isFromGroup = req.reqType == FOODREQ;
-	int table = sh->fSt.assignedTable[req.reqGroup];
-
     if (semUp (semgid, sh->mutex) == -1) {                                                  /* exit critical region */
         perror ("error on the down operation for semaphore access (WT)");
         exit (EXIT_FAILURE);
@@ -190,7 +180,7 @@ static request waitForClientOrChef()
     // TODO insert your code here
 	// If request is from group,
 	// up for group in table that request was received
-	if (isFromGroup && semUp (semgid, sh->requestReceived[table]) == -1)  {                                                  /* enter critical region */
+	if (semUp (semgid, sh->waiterRequestPossible) == -1)  {                                                  /* enter critical region */
 		perror ("error on the up operation for semaphore access (WT)");
 		exit (EXIT_FAILURE);
 	}
@@ -211,6 +201,8 @@ static request waitForClientOrChef()
  */
 static void informChef (int n)
 {
+    int table_id;
+
     if (semDown (semgid, sh->mutex) == -1)  {                                                  /* enter critical region */
         perror ("error on the up operation for semaphore access (WT)");
         exit (EXIT_FAILURE);
@@ -221,12 +213,18 @@ static void informChef (int n)
 	sh->fSt.st.waiterStat = INFORM_CHEF;
 	sh->fSt.foodOrder = 1;
 	sh->fSt.foodGroup = n;
+    table_id = sh->fSt.assignedTable[n];
 
 	// Save state
 	saveState(nFic, &sh->fSt);
 
     if (semUp (semgid, sh->mutex) == -1)                                                   /* exit critical region */
     { perror ("error on the down operation for semaphore access (WT)");
+        exit (EXIT_FAILURE);
+    }
+
+    if (semUp(semgid, sh->requestReceived[table_id]) == -1)  {                                                  /* enter critical region */
+        perror ("error on the up operation for semaphore access (WT)");
         exit (EXIT_FAILURE);
     }
     
